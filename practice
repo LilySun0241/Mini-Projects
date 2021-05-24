@@ -1,0 +1,47 @@
+import pandas as pd 
+import numpy as np 
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Coronavirus data
+corona_data = pd.read_csv("Datasets/covid19_Confirmed_dataset.csv")
+corona_data.head(10)
+corona_data.shape
+corona_data.drop(['Lat', 'Long'], axis = 1, inplace = True)
+df_1 = corona_data.groupby('Country/Region').sum()
+
+df_1.loc['China'].plot()
+df_1.loc['Italy'].plot()
+df_1.loc['Spain'].plot()
+plt.legend()
+
+df_1.loc['China'][:3].plot()
+
+df_1.loc['China'].diff().plot()
+
+# find maxmimum infection rate for China
+df_1.loc['China'].diff().max()
+
+# find maximum infection rate for all of the countries
+countries = list(df_1.index)
+max_infection_rates = []
+for c in countries:
+    max_infection_rates.append(df_1.loc[c].diff().max())
+df_1['Max infection rate'] = max_infection_rates
+
+df_2 = pd.DataFrame(df_1['Max infection rate'])
+
+# World happiness data
+happiness_data = pd.read_csv("Datasets/worldwide_happiness_report.csv")
+happiness_data.drop(['Overall rank', 'Score', 'Generosity', 'Perceptions of corruption'], axis = 1, inplace = True)
+happiness_data.set_index(['Country or region'], drop = True, inplace = True)
+
+#merge two dataframe
+df_merge = pd.merge(df_2, happiness_data, how = 'inner', left_index = True, right_index = True)
+
+df_merge.corr()
+
+
+# Data visualization
+sns.scatterplot(df_merge['GDP per capita'], np.log(df_merge['Max infection rate']))
+sns.regplot(df_merge['GDP per capita'], np.log(df_merge['Max infection rate']))
