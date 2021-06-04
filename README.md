@@ -1,1 +1,1 @@
-# Practice-Projects from Cousera
+# Practice-Projects
